@@ -1,0 +1,336 @@
+-- =======================================================
+-- JEMS NATIVE MOBILE UI (TOP TABS & SMOOTH DRAGGING)
+-- =======================================================
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+
+-- Iwasan ang duplicate UI kapag inexecute ulit
+if PlayerGui:FindFirstChild("JemsDirectGui") then
+    PlayerGui:FindFirstChild("JemsDirectGui"):Destroy()
+end
+
+-- ScreenGui Container
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "JemsDirectGui"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = PlayerGui
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- Global Variables para sa State
+getgenv().AutoBox11 = false
+getgenv().AutoCollectMoney = false
+getgenv().AutoClaimWinTrophy = false 
+
+-- FUNCTION PARA SA SMOOTH DRAGGING (Mobile & PC Friendly)
+local function makeDraggable(frame, dragSpeed)
+    dragSpeed = dragSpeed or 0.15
+    local dragging = false
+    local dragInput, dragStart, startPos
+
+    local function update(input)
+        local delta = input.Position - dragStart
+        local targetPos = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        TweenService:Create(frame, TweenInfo.new(dragSpeed), {Position = targetPos}):Play()
+    end
+
+    frame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = frame.Position
+
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
+
+    frame.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            update(input)
+        end
+    end)
+end
+
+-- 1. FLOATING BUTTON (Pang Open/Close)
+local LogoBtn = Instance.new("ImageButton")
+LogoBtn.Name = "LogoBtn"
+LogoBtn.Parent = ScreenGui
+LogoBtn.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+LogoBtn.Position = UDim2.new(0.5, -20, 0.2, 0) 
+LogoBtn.Size = UDim2.new(0, 40, 0, 40)         
+LogoBtn.Image = "rbxassetid://6031068426" 
+LogoBtn.ImageColor3 = Color3.fromRGB(255, 255, 255)
+LogoBtn.Active = true
+
+local BtnCorner = Instance.new("UICorner")
+BtnCorner.CornerRadius = UDim.new(0, 20)
+BtnCorner.Parent = LogoBtn
+
+local BtnStroke = Instance.new("UIStroke")
+BtnStroke.Color = Color3.fromRGB(255, 255, 255)
+BtnStroke.Thickness = 1.5
+BtnStroke.Parent = LogoBtn
+
+makeDraggable(LogoBtn, 0.1)
+
+-- 2. MAIN PANEL (Solid Black Frame)
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0) 
+MainFrame.Position = UDim2.new(0.5, -75, 0.35, 0)
+MainFrame.Size = UDim2.new(0, 160, 0, 195) -- Size setup for clean alignment
+MainFrame.Visible = true
+MainFrame.Active = true
+
+local FrameCorner = Instance.new("UICorner")
+FrameCorner.CornerRadius = UDim.new(0, 8)
+FrameCorner.Parent = MainFrame
+
+local FrameStroke = Instance.new("UIStroke")
+FrameStroke.Color = Color3.fromRGB(255, 255, 255)
+FrameStroke.Thickness = 1
+FrameStroke.Parent = MainFrame
+
+makeDraggable(MainFrame, 0.1)
+
+-- =======================================================
+-- TOP TAB NAVIGATION (Main vs Credits)
+-- =======================================================
+local TabHeaderFrame = Instance.new("Frame")
+TabHeaderFrame.Name = "TabHeaderFrame"
+TabHeaderFrame.Parent = MainFrame
+TabHeaderFrame.BackgroundTransparency = 1
+TabHeaderFrame.Position = UDim2.new(0, 0, 0, 5)
+TabHeaderFrame.Size = UDim2.new(1, 0, 0, 25)
+
+local MainTabBtn = Instance.new("TextButton")
+MainTabBtn.Name = "MainTabBtn"
+MainTabBtn.Parent = TabHeaderFrame
+MainTabBtn.BackgroundTransparency = 1
+MainTabBtn.Size = UDim2.new(0.5, 0, 1, 0)
+MainTabBtn.Font = Enum.Font.SourceSansBold
+MainTabBtn.Text = "Main"
+MainTabBtn.TextColor3 = Color3.fromRGB(255, 255, 255) -- Active text color
+MainTabBtn.TextSize = 15
+
+local CreditsTabBtn = Instance.new("TextButton")
+CreditsTabBtn.Name = "CreditsTabBtn"
+CreditsTabBtn.Parent = TabHeaderFrame
+CreditsTabBtn.BackgroundTransparency = 1
+CreditsTabBtn.Position = UDim2.new(0.5, 0, 0, 0)
+CreditsTabBtn.Size = UDim2.new(0.5, 0, 1, 0)
+CreditsTabBtn.Font = Enum.Font.SourceSansBold
+CreditsTabBtn.Text = "Credits"
+CreditsTabBtn.TextColor3 = Color3.fromRGB(130, 130, 130) -- Inactive text color
+CreditsTabBtn.TextSize = 15
+
+-- Divider line below the tabs
+local Line = Instance.new("Frame")
+Line.Parent = MainFrame
+Line.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+Line.Position = UDim2.new(0, 10, 0, 32)
+Line.Size = UDim2.new(1, -20, 0, 1)
+
+-- =======================================================
+-- CONTAINERS FOR CONTENT
+-- =======================================================
+
+-- MAIN CONTENT FRAME (Para sa mga scripts)
+local MainContent = Instance.new("Frame")
+MainContent.Name = "MainContent"
+MainContent.Parent = MainFrame
+MainContent.BackgroundTransparency = 1
+MainContent.Position = UDim2.new(0, 0, 0, 35)
+MainContent.Size = UDim2.new(1, 0, 1, -35)
+MainContent.Visible = true
+
+-- CREDITS CONTENT FRAME (Para sa owner name)
+local CreditsContent = Instance.new("Frame")
+CreditsContent.Name = "CreditsContent"
+CreditsContent.Parent = MainFrame
+CreditsContent.BackgroundTransparency = 1
+CreditsContent.Position = UDim2.new(0, 0, 0, 35)
+CreditsContent.Size = UDim2.new(1, 0, 1, -35)
+CreditsContent.Visible = false
+
+-- Credits Display
+local CreditText1 = Instance.new("TextLabel")
+CreditText1.Parent = CreditsContent
+CreditText1.BackgroundTransparency = 1
+CreditText1.Size = UDim2.new(1, 0, 0, 30)
+CreditText1.Position = UDim2.new(0, 0, 0, 30)
+CreditText1.Font = Enum.Font.SourceSans
+CreditText1.Text = "Script Owner:"
+CreditText1.TextColor3 = Color3.fromRGB(160, 160, 160)
+CreditText1.TextSize = 13
+
+local CreditOwner = Instance.new("TextLabel")
+CreditOwner.Parent = CreditsContent
+CreditOwner.BackgroundTransparency = 1
+CreditOwner.Size = UDim2.new(1, 0, 0, 40)
+CreditOwner.Position = UDim2.new(0, 0, 0, 50)
+CreditOwner.Font = Enum.Font.SourceSansBold
+CreditOwner.Text = "Jems"
+CreditOwner.TextColor3 = Color3.fromRGB(0, 255, 150) -- Glowing Green name
+CreditOwner.TextSize = 22
+
+-- =======================================================
+-- MAIN TAB BUTTONS (Automation Toggles)
+-- =======================================================
+
+-- 3. TOGGLE BUTTON 1: AUTO BOX 10
+local ToggleButton1 = Instance.new("TextButton")
+ToggleButton1.Name = "ToggleButton1"
+ToggleButton1.Parent = MainContent
+ToggleButton1.BackgroundColor3 = Color3.fromRGB(40, 40, 40) 
+ToggleButton1.Position = UDim2.new(0.1, 0, 0.05, 0)
+ToggleButton1.Size = UDim2.new(0, 128, 0, 32)
+ToggleButton1.Font = Enum.Font.SourceSansBold
+ToggleButton1.Text = "Open OP Block (Spam)"
+ToggleButton1.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton1.TextSize = 13
+
+local ToggleCorner1 = Instance.new("UICorner")
+ToggleCorner1.CornerRadius = UDim.new(0, 6)
+ToggleCorner1.Parent = ToggleButton1
+
+-- 4. TOGGLE BUTTON 2: AUTO COLLECT MONEY
+local ToggleButton2 = Instance.new("TextButton")
+ToggleButton2.Name = "ToggleButton2"
+ToggleButton2.Parent = MainContent
+ToggleButton2.BackgroundColor3 = Color3.fromRGB(40, 40, 40) 
+ToggleButton2.Position = UDim2.new(0.1, 0, 0.35, 0)
+ToggleButton2.Size = UDim2.new(0, 128, 0, 32)
+ToggleButton2.Font = Enum.Font.SourceSansBold
+ToggleButton2.Text = "Auto Collect Money: OFF"
+ToggleButton2.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton2.TextSize = 12
+
+local ToggleCorner2 = Instance.new("UICorner")
+ToggleCorner2.CornerRadius = UDim.new(0, 6)
+ToggleCorner2.Parent = ToggleButton2
+
+-- 5. TOGGLE BUTTON 3: AUTO WIN TROPHY
+local ToggleButton3 = Instance.new("TextButton")
+ToggleButton3.Name = "ToggleButton3"
+ToggleButton3.Parent = MainContent
+ToggleButton3.BackgroundColor3 = Color3.fromRGB(40, 40, 40) 
+ToggleButton3.Position = UDim2.new(0.1, 0, 0.65, 0)
+ToggleButton3.Size = UDim2.new(0, 128, 0, 32)
+ToggleButton3.Font = Enum.Font.SourceSansBold
+ToggleButton3.Text = "Auto Win Trophy: OFF"
+ToggleButton3.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleButton3.TextSize = 12
+
+local ToggleCorner3 = Instance.new("UICorner")
+ToggleCorner3.CornerRadius = UDim.new(0, 6)
+ToggleCorner3.Parent = ToggleButton3
+
+
+-- =======================================================
+-- INTERACTIVE LOGIC (Switching Top Tabs)
+-- =======================================================
+
+-- Open/Close Control
+LogoBtn.MouseButton1Click:Connect(function()
+    MainFrame.Visible = not MainFrame.Visible
+end)
+
+-- Switch to Main Tab
+MainTabBtn.MouseButton1Click:Connect(function()
+    MainContent.Visible = true
+    CreditsContent.Visible = false
+    
+    -- Highlight effect
+    MainTabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    CreditsTabBtn.TextColor3 = Color3.fromRGB(130, 130, 130)
+end)
+
+-- Switch to Credits Tab
+CreditsTabBtn.MouseButton1Click:Connect(function()
+    MainContent.Visible = false
+    CreditsContent.Visible = true
+    
+    -- Highlight effect
+    CreditsTabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    MainTabBtn.TextColor3 = Color3.fromRGB(130, 130, 130)
+end)
+
+
+-- =======================================================
+-- AUTOMATION SCRIPT CODE
+-- =======================================================
+local SummonRemote = game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Event"):WaitForChild("Summon"):WaitForChild("[C-S]OpenJackpot")
+local MoneyRemote = game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Event"):WaitForChild("Plot"):WaitForChild("[C-S]CollectAllAnimalCash")
+local WinRemote = game:GetService("ReplicatedStorage"):WaitForChild("Remote"):WaitForChild("Event"):WaitForChild("Race"):WaitForChild("[C-S]ClaimTrophy")
+
+-- FUNCTIONALITY PARA SA BOX 11
+ToggleButton1.MouseButton1Click:Connect(function()
+    getgenv().AutoBox11 = not getgenv().AutoBox11
+    if getgenv().AutoBox11 then
+        ToggleButton1.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+        task.spawn(function()
+            while getgenv().AutoBox11 do
+                pcall(function()
+                    SummonRemote:FireServer("Box11", 11)
+                end)
+                task.wait(0.3) 
+            end
+        end)
+    else
+        ToggleButton1.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    end
+end)
+
+-- FUNCTIONALITY PARA SA COLLECT MONEY
+ToggleButton2.MouseButton1Click:Connect(function()
+    getgenv().AutoCollectMoney = not getgenv().AutoCollectMoney
+    if getgenv().AutoCollectMoney then
+        ToggleButton2.Text = "Auto Collect Money: ON"
+        ToggleButton2.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+        task.spawn(function()
+            while getgenv().AutoCollectMoney do
+                pcall(function()
+                    MoneyRemote:FireServer()
+                end)
+                task.wait(0.5) 
+            end
+        end)
+    else
+        ToggleButton2.Text = "Auto Collect Money: OFF"
+        ToggleButton2.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    end
+end)
+
+-- FUNCTIONALITY PARA SA AUTO CLAIM WIN (TROPHY)
+ToggleButton3.MouseButton1Click:Connect(function()
+    getgenv().AutoClaimWinTrophy = not getgenv().AutoClaimWinTrophy
+    if getgenv().AutoClaimWinTrophy then
+        ToggleButton3.Text = "Auto Win Trophy: ON"
+        ToggleButton3.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+        task.spawn(function()
+            while getgenv().AutoClaimWinTrophy do
+                pcall(function()
+                    WinRemote:FireServer()
+                end)
+                task.wait(0.3) 
+            end
+        end)
+    else
+        ToggleButton3.Text = "Auto Win Trophy: OFF"
+        ToggleButton3.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    end
+end)
