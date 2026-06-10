@@ -1,4 +1,3 @@
- 
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
@@ -322,3 +321,4 @@ ToggleButton3.MouseButton1Click:Connect(function()
         ToggleButton3.Text = "Auto Godly Block: OFF"
         ToggleButton3.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
     end
+end)
