@@ -1,0 +1,337 @@
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+if PlayerGui:FindFirstChild("JemsMultiTabHub") then
+    PlayerGui:FindFirstChild("JemsMultiTabHub"):Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "JemsMultiTabHub"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = PlayerGui
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+getgenv().AutoFastDrop = false
+getgenv().AutoEquipBest = false
+getgenv().AutoRaising = false
+getgenv().AutoGoldenBall = false
+getgenv().AutoDiamondBall = false
+getgenv().AutoBouncyBall = false
+getgenv().AutoMultiBall = false
+
+local function makeDraggable(frame, dragSpeed)
+    dragSpeed = dragSpeed or 0.15
+    local dragging = false
+    local dragInput, dragStart, startPos
+
+    frame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true
+            dragStart = input.Position
+            startPos = frame.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then dragging = false end
+            end)
+        end
+    end)
+
+    frame.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then
+            dragInput = input
+        end
+    end)
+
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            local delta = input.Position - dragStart
+            local targetPos = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+            TweenService:Create(frame, TweenInfo.new(dragSpeed), {Position = targetPos}):Play()
+        end
+    end)
+end
+
+local LogoBtn = Instance.new("TextButton")
+LogoBtn.Name = "LogoBtn"
+LogoBtn.Parent = ScreenGui
+LogoBtn.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+LogoBtn.Position = UDim2.new(0.1, 0, 0.35, 0) 
+LogoBtn.Size = UDim2.new(0, 40, 0, 40)         
+LogoBtn.Font = Enum.Font.SourceSansBold
+LogoBtn.Text = "J"
+LogoBtn.TextColor3 = Color3.fromRGB(255, 85, 0)
+LogoBtn.TextSize = 20
+Instance.new("UICorner", LogoBtn).CornerRadius = UDim.new(0, 20)
+local BtnStroke = Instance.new("UIStroke", LogoBtn)
+BtnStroke.Color = Color3.fromRGB(255, 255, 255)
+BtnStroke.Thickness = 1.5
+makeDraggable(LogoBtn, 0.1)
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15) 
+MainFrame.Position = UDim2.new(0.1, 0, 0.45, 0)
+MainFrame.Size = UDim2.new(0, 180, 0, 240) 
+Instance.new("UICorner", MainFrame).CornerRadius = UDim.new(0, 8)
+local FrameStroke = Instance.new("UIStroke", MainFrame)
+FrameStroke.Color = Color3.fromRGB(255, 255, 255)
+makeDraggable(MainFrame, 0.1)
+
+local GameTitle = Instance.new("TextLabel")
+GameTitle.Parent = MainFrame
+GameTitle.BackgroundTransparency = 1
+GameTitle.Position = UDim2.new(0, 0, 0, 6)
+GameTitle.Size = UDim2.new(1, 0, 0, 16)
+GameTitle.Font = Enum.Font.SourceSansBold
+GameTitle.Text = "Drop Ball for Brainrot"
+GameTitle.TextColor3 = Color3.fromRGB(255, 85, 0)
+GameTitle.TextSize = 12
+
+local TabBar = Instance.new("Frame", MainFrame)
+TabBar.BackgroundTransparency = 1
+TabBar.Position = UDim2.new(0, 0, 0, 26)
+TabBar.Size = UDim2.new(1, 0, 0, 25)
+
+local MainTabBtn = Instance.new("TextButton", TabBar)
+MainTabBtn.Size = UDim2.new(0.333, 0, 1, 0)
+MainTabBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MainTabBtn.Font = Enum.Font.SourceSansBold
+MainTabBtn.Text = "Main"
+MainTabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+MainTabBtn.TextSize = 10
+
+local UpgradeTabBtn = Instance.new("TextButton", TabBar)
+UpgradeTabBtn.Size = UDim2.new(0.333, 0, 1, 0)
+UpgradeTabBtn.Position = UDim2.new(0.333, 0, 0, 0)
+UpgradeTabBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+UpgradeTabBtn.Font = Enum.Font.SourceSansBold
+UpgradeTabBtn.Text = "Upgrades"
+UpgradeTabBtn.TextColor3 = Color3.fromRGB(150, 150, 150)
+UpgradeTabBtn.TextSize = 10
+
+local CreditTabBtn = Instance.new("TextButton", TabBar)
+CreditTabBtn.Size = UDim2.new(0.334, 0, 1, 0)
+CreditTabBtn.Position = UDim2.new(0.666, 0, 0, 0)
+CreditTabBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+CreditTabBtn.Font = Enum.Font.SourceSansBold
+CreditTabBtn.Text = "Credits"
+CreditTabBtn.TextColor3 = Color3.fromRGB(150, 150, 150)
+CreditTabBtn.TextSize = 10
+
+local MainContent = Instance.new("Frame", MainFrame)
+MainContent.BackgroundTransparency = 1
+MainContent.Position = UDim2.new(0, 0, 0, 55)
+MainContent.Size = UDim2.new(1, 0, 1, -55)
+
+local MainTabFrame = Instance.new("ScrollingFrame", MainContent)
+MainTabFrame.Size = UDim2.new(1, 0, 1, 0)
+MainTabFrame.BackgroundTransparency = 1
+MainTabFrame.ScrollBarThickness = 2
+MainTabFrame.CanvasSize = UDim2.new(0, 0, 0, 180)
+
+local UIList1 = Instance.new("UIListLayout", MainTabFrame)
+UIList1.HorizontalAlignment = Enum.HorizontalAlignment.Center
+UIList1.Padding = UDim.new(0, 6)
+
+local ToggleDrop = Instance.new("TextButton", MainTabFrame)
+ToggleDrop.Size = UDim2.new(0, 150, 0, 34)
+ToggleDrop.BackgroundColor3 = Color3.fromRGB(40, 40, 40) 
+ToggleDrop.Font = Enum.Font.SourceSansBold
+ToggleDrop.Text = "FAST DROP: OFF"
+ToggleDrop.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleDrop.TextSize = 10
+Instance.new("UICorner", ToggleDrop).CornerRadius = UDim.new(0, 5)
+
+local ToggleEquip = Instance.new("TextButton", MainTabFrame)
+ToggleEquip.Size = UDim2.new(0, 150, 0, 34)
+ToggleEquip.BackgroundColor3 = Color3.fromRGB(40, 40, 40) 
+ToggleEquip.Font = Enum.Font.SourceSansBold
+ToggleEquip.Text = "AUTO EQUIP: OFF"
+ToggleEquip.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleEquip.TextSize = 10
+Instance.new("UICorner", ToggleEquip).CornerRadius = UDim.new(0, 5)
+
+local ToggleRaising = Instance.new("TextButton", MainTabFrame)
+ToggleRaising.Size = UDim2.new(0, 150, 0, 34)
+ToggleRaising.BackgroundColor3 = Color3.fromRGB(40, 40, 40) 
+ToggleRaising.Font = Enum.Font.SourceSansBold
+ToggleRaising.Text = "AUTO RAISING: OFF"
+ToggleRaising.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleRaising.TextSize = 10
+Instance.new("UICorner", ToggleRaising).CornerRadius = UDim.new(0, 5)
+
+local UpgradeTabFrame = Instance.new("ScrollingFrame", MainContent)
+UpgradeTabFrame.Size = UDim2.new(1, 0, 1, 0)
+UpgradeTabFrame.BackgroundTransparency = 1
+UpgradeTabFrame.Visible = false
+UpgradeTabFrame.ScrollBarThickness = 2
+UpgradeTabFrame.CanvasSize = UDim2.new(0, 0, 0, 200)
+
+local UIList2 = Instance.new("UIListLayout", UpgradeTabFrame)
+UIList2.HorizontalAlignment = Enum.HorizontalAlignment.Center
+UIList2.Padding = UDim.new(0, 6)
+
+local function createUpgradeBtn(name, text)
+    local btn = Instance.new("TextButton", UpgradeTabFrame)
+    btn.Size = UDim2.new(0, 150, 0, 32)
+    btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    btn.Font = Enum.Font.SourceSansBold
+    btn.Text = "AUTO " .. text .. ": OFF"
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.TextSize = 10
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 5)
+    return btn
+end
+
+local BtnGolden = createUpgradeBtn("GoldenBall", "GOLDEN BALL")
+local BtnDiamond = createUpgradeBtn("DiamondBall", "DIAMOND BALL")
+local BtnBouncy = createUpgradeBtn("BouncyBall", "BOUNCY BALL")
+local BtnMulti = createUpgradeBtn("MultiBall", "MULTI BALL")
+
+local CreditTabFrame = Instance.new("Frame", MainContent)
+CreditTabFrame.Size = UDim2.new(1, 0, 1, 0)
+CreditTabFrame.BackgroundTransparency = 1
+CreditTabFrame.Visible = false
+
+local CreditLabel = Instance.new("TextLabel", CreditTabFrame)
+CreditLabel.Size = UDim2.new(1, 0, 0, 50)
+CreditLabel.Position = UDim2.new(0, 0, 0, 30)
+CreditLabel.BackgroundTransparency = 1
+CreditLabel.Font = Enum.Font.SourceSansBold
+CreditLabel.Text = "Script Created By:"
+CreditLabel.TextColor3 = Color3.fromRGB(200, 200, 200)
+CreditLabel.TextSize = 12
+
+local AuthorLabel = Instance.new("TextLabel", CreditTabFrame)
+AuthorLabel.Size = UDim2.new(1, 0, 0, 30)
+AuthorLabel.Position = UDim2.new(0, 0, 0, 65)
+AuthorLabel.BackgroundTransparency = 1
+AuthorLabel.Font = Enum.Font.SourceSansBold
+AuthorLabel.Text = "Jems" 
+AuthorLabel.TextColor3 = Color3.fromRGB(255, 85, 0)
+AuthorLabel.TextSize = 22
+
+local function switchTab(activeFrame, activeBtn, inactiveBtn1, inactiveBtn2)
+    MainTabFrame.Visible = (MainTabFrame == activeFrame)
+    UpgradeTabFrame.Visible = (UpgradeTabFrame == activeFrame)
+    CreditTabFrame.Visible = (CreditTabFrame == activeFrame)
+    
+    activeBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    activeBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    
+    inactiveBtn1.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    inactiveBtn1.TextColor3 = Color3.fromRGB(150, 150, 150)
+    inactiveBtn2.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    inactiveBtn2.TextColor3 = Color3.fromRGB(150, 150, 150)
+end
+
+MainTabBtn.MouseButton1Click:Connect(function() switchTab(MainTabFrame, MainTabBtn, UpgradeTabBtn, CreditTabBtn) end)
+UpgradeTabBtn.MouseButton1Click:Connect(function() switchTab(UpgradeTabFrame, UpgradeTabBtn, MainTabBtn, CreditTabBtn) end)
+CreditTabBtn.MouseButton1Click:Connect(function() switchTab(CreditTabFrame, CreditTabBtn, MainTabBtn, UpgradeTabBtn) end)
+
+LogoBtn.MouseButton1Click:Connect(function() MainFrame.Visible = not MainFrame.Visible end)
+
+ToggleDrop.MouseButton1Click:Connect(function()
+    getgenv().AutoFastDrop = not getgenv().AutoFastDrop
+    ToggleDrop.Text = "FAST DROP: " .. (getgenv().AutoFastDrop and "ON" or "OFF")
+    ToggleDrop.BackgroundColor3 = getgenv().AutoFastDrop and Color3.fromRGB(255, 85, 0) or Color3.fromRGB(40, 40, 40)
+end)
+
+ToggleEquip.MouseButton1Click:Connect(function()
+    getgenv().AutoEquipBest = not getgenv().AutoEquipBest
+    ToggleEquip.Text = "AUTO EQUIP: " .. (getgenv().AutoEquipBest and "ON" or "OFF")
+    ToggleEquip.BackgroundColor3 = getgenv().AutoEquipBest and Color3.fromRGB(0, 180, 255) or Color3.fromRGB(40, 40, 40)
+end)
+
+ToggleRaising.MouseButton1Click:Connect(function()
+    getgenv().AutoRaising = not getgenv().AutoRaising
+    ToggleRaising.Text = "AUTO RAISING: " .. (getgenv().AutoRaising and "ON" or "OFF")
+    ToggleRaising.BackgroundColor3 = getgenv().AutoRaising and Color3.fromRGB(170, 0, 255) or Color3.fromRGB(40, 40, 40)
+end)
+
+BtnGolden.MouseButton1Click:Connect(function()
+    getgenv().AutoGoldenBall = not getgenv().AutoGoldenBall
+    BtnGolden.Text = "AUTO GOLDEN: " .. (getgenv().AutoGoldenBall and "ON" or "OFF")
+    BtnGolden.BackgroundColor3 = getgenv().AutoGoldenBall and Color3.fromRGB(212, 175, 55) or Color3.fromRGB(40, 40, 40)
+end)
+
+BtnDiamond.MouseButton1Click:Connect(function()
+    getgenv().AutoDiamondBall = not getgenv().AutoDiamondBall
+    BtnDiamond.Text = "AUTO DIAMOND: " .. (getgenv().AutoDiamondBall and "ON" or "OFF")
+    BtnDiamond.BackgroundColor3 = getgenv().AutoDiamondBall and Color3.fromRGB(0, 225, 255) or Color3.fromRGB(40, 40, 40)
+end)
+
+BtnBouncy.MouseButton1Click:Connect(function()
+    getgenv().AutoBouncyBall = not getgenv().AutoBouncyBall
+    BtnBouncy.Text = "AUTO BOUNCY: " .. (getgenv().AutoBouncyBall and "ON" or "OFF")
+    BtnBouncy.BackgroundColor3 = getgenv().AutoBouncyBall and Color3.fromRGB(0, 255, 120) or Color3.fromRGB(40, 40, 40)
+end)
+
+BtnMulti.MouseButton1Click:Connect(function()
+    getgenv().AutoMultiBall = not getgenv().AutoMultiBall
+    BtnMulti.Text = "AUTO MULTI: " .. (getgenv().AutoMultiBall and "ON" or "OFF")
+    BtnMulti.BackgroundColor3 = getgenv().AutoMultiBall and Color3.fromRGB(255, 0, 100) or Color3.fromRGB(40, 40, 40)
+end)
+
+local NetFolder = ReplicatedStorage:WaitForChild("Packages"):WaitForChild("_Index")["sleitnick_net@0.2.0"].net
+local DropEvent = NetFolder["RE/BallDrop"]
+local EquipRemote = NetFolder["RF/EquipBestBrainrots"]
+local UpgradeRemote = NetFolder["RF/PurchaseUpgrade"]
+local RaiseLevelRemote = NetFolder["RF/UnlockBallDropLevel"]
+
+task.spawn(function()
+    while true do
+        if getgenv().AutoFastDrop then
+            for i = 1, 8 do
+                pcall(function() DropEvent:FireServer(1) end)
+            end
+        end
+        task.wait()
+    end
+end)
+
+task.spawn(function()
+    while true do
+        if getgenv().AutoEquipBest then
+            pcall(function() task.spawn(function() EquipRemote:InvokeServer() end) end)
+        end
+        task.wait(4)
+    end
+end)
+
+task.spawn(function()
+    while true do
+        if getgenv().AutoRaising then
+            pcall(function() 
+                task.spawn(function() 
+                    RaiseLevelRemote:InvokeServer() 
+                end) 
+            end)
+        end
+        task.wait(2)
+    end
+end)
+
+task.spawn(function()
+    while true do
+        pcall(function()
+            if getgenv().AutoGoldenBall then
+                task.spawn(function() UpgradeRemote:InvokeServer("GoldenBall") end)
+            end
+            if getgenv().AutoDiamondBall then
+                task.spawn(function() UpgradeRemote:InvokeServer("DiamondBall") end)
+            end
+            if getgenv().AutoBouncyBall then
+                task.spawn(function() UpgradeRemote:InvokeServer("BouncyBall") end)
+            end
+            if getgenv().AutoMultiBall then
+                task.spawn(function() UpgradeRemote:InvokeServer("MultiBall") end)
+            end
+        end)
+        task.wait(1) 
+    end
+end)
