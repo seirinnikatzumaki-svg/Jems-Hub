@@ -18,8 +18,7 @@ ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 -- Global Variables para sa State
 getgenv().AutoFastPower = false
-getgenv().AutoOGBlock = false
-getgenv().AutoGodlyBlock = false
+getgenv().GetMutationBrainrot = false
 
 -- FUNCTION PARA SA SMOOTH DRAGGING (Mobile & PC Friendly)
 local function makeDraggable(frame, dragSpeed)
@@ -84,13 +83,13 @@ BtnStroke.Parent = LogoBtn
 
 makeDraggable(LogoBtn, 0.1)
 
--- 2. MAIN PANEL (Solid Black Frame - In-adjust sa 195 dahil 3 buttons na lang)
+-- 2. MAIN PANEL (Solid Black Frame - Saktong sukat para sa dalawang buttons)
 local MainFrame = Instance.new("Frame")
 MainFrame.Name = "MainFrame"
 MainFrame.Parent = ScreenGui
 MainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0) 
 MainFrame.Position = UDim2.new(0.3, -75, 0.35, 0)
-MainFrame.Size = UDim2.new(0, 160, 0, 195) 
+MainFrame.Size = UDim2.new(0, 160, 0, 150) 
 MainFrame.Visible = true
 MainFrame.Active = true
 
@@ -191,7 +190,7 @@ local ToggleButton1 = Instance.new("TextButton")
 ToggleButton1.Name = "ToggleButton1"
 ToggleButton1.Parent = MainContent
 ToggleButton1.BackgroundColor3 = Color3.fromRGB(40, 40, 40) 
-ToggleButton1.Position = UDim2.new(0.1, 0, 0.03, 0)
+ToggleButton1.Position = UDim2.new(0.1, 0, 0.1, 0)
 ToggleButton1.Size = UDim2.new(0, 128, 0, 32)
 ToggleButton1.Font = Enum.Font.SourceSansBold
 ToggleButton1.Text = "Auto Fast Power: OFF"
@@ -202,37 +201,21 @@ local ToggleCorner1 = Instance.new("UICorner")
 ToggleCorner1.CornerRadius = UDim.new(0, 6)
 ToggleCorner1.Parent = ToggleButton1
 
--- 2. TOGGLE BUTTON 2: AUTO OG BLOCK
+-- 2. TOGGLE BUTTON 2: MUTATION BRAINROT
 local ToggleButton2 = Instance.new("TextButton")
 ToggleButton2.Name = "ToggleButton2"
 ToggleButton2.Parent = MainContent
 ToggleButton2.BackgroundColor3 = Color3.fromRGB(40, 40, 40) 
-ToggleButton2.Position = UDim2.new(0.1, 0, 0.35, 0)
+ToggleButton2.Position = UDim2.new(0.1, 0, 0.55, 0)
 ToggleButton2.Size = UDim2.new(0, 128, 0, 32)
 ToggleButton2.Font = Enum.Font.SourceSansBold
-ToggleButton2.Text = "Auto OG Block: OFF"
+ToggleButton2.Text = "Mutation Brainrot: OFF"
 ToggleButton2.TextColor3 = Color3.fromRGB(255, 255, 255)
-ToggleButton2.TextSize = 12
+ToggleButton2.TextSize = 11
 
 local ToggleCorner2 = Instance.new("UICorner")
 ToggleCorner2.CornerRadius = UDim.new(0, 6)
 ToggleCorner2.Parent = ToggleButton2
-
--- 3. TOGGLE BUTTON 3: AUTO GODLY BLOCK
-local ToggleButton3 = Instance.new("TextButton")
-ToggleButton3.Name = "ToggleButton3"
-ToggleButton3.Parent = MainContent
-ToggleButton3.BackgroundColor3 = Color3.fromRGB(40, 40, 40) 
-ToggleButton3.Position = UDim2.new(0.1, 0, 0.67, 0)
-ToggleButton3.Size = UDim2.new(0, 128, 0, 32)
-ToggleButton3.Font = Enum.Font.SourceSansBold
-ToggleButton3.Text = "Auto Godly Block: OFF"
-ToggleButton3.TextColor3 = Color3.fromRGB(255, 255, 255)
-ToggleButton3.TextSize = 12
-
-local ToggleCorner3 = Instance.new("UICorner")
-ToggleCorner3.CornerRadius = UDim.new(0, 6)
-ToggleCorner3.Parent = ToggleButton3
 
 
 -- =======================================================
@@ -283,42 +266,22 @@ ToggleButton1.MouseButton1Click:Connect(function()
     end
 end)
 
--- FUNCTIONALITY PARA SA AUTO OG BLOCK
+-- FUNCTIONALITY PARA SA GET BRAINROT BEST WITH MUTATION
 ToggleButton2.MouseButton1Click:Connect(function()
-    getgenv().AutoOGBlock = not getgenv().AutoOGBlock
-    if getgenv().AutoOGBlock then
-        ToggleButton2.Text = "Auto OG Block: ON"
+    getgenv().GetMutationBrainrot = not getgenv().GetMutationBrainrot
+    if getgenv().GetMutationBrainrot then
+        ToggleButton2.Text = "Mutation Brainrot: ON"
         ToggleButton2.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
         task.spawn(function()
-            while getgenv().AutoOGBlock do
+            while getgenv().GetMutationBrainrot do
                 pcall(function()
-                    NetworkRemote:FireServer("AwardLuckyBlock", "OG")
+                    NetworkRemote:FireServer("AwardBrainrot", "BalerinoLololo", "Lava")
                 end)
                 task.wait(0.3) 
             end
         end)
     else
-        ToggleButton2.Text = "Auto OG Block: OFF"
+        ToggleButton2.Text = "Mutation Brainrot: OFF"
         ToggleButton2.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-    end
-end)
-
--- FUNCTIONALITY PARA SA AUTO GODLY BLOCK
-ToggleButton3.MouseButton1Click:Connect(function()
-    getgenv().AutoGodlyBlock = not getgenv().AutoGodlyBlock
-    if getgenv().AutoGodlyBlock then
-        ToggleButton3.Text = "Auto Godly Block: ON"
-        ToggleButton3.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
-        task.spawn(function()
-            while getgenv().AutoGodlyBlock do
-                pcall(function()
-                    NetworkRemote:FireServer("AwardLuckyBlock", "Godly")
-                end)
-                task.wait(0.3) 
-            end
-        end)
-    else
-        ToggleButton3.Text = "Auto Godly Block: OFF"
-        ToggleButton3.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
     end
 end)
