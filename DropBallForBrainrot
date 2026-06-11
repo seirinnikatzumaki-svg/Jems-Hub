@@ -16,6 +16,7 @@ ScreenGui.Parent = PlayerGui
 ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 
 getgenv().AutoFastDrop = false
+getgenv().SelectedDropAmount = 1
 getgenv().AutoEquipBest = false
 getgenv().AutoRaising = false
 getgenv().AutoStack = false
@@ -132,11 +133,61 @@ local MainTabFrame = Instance.new("ScrollingFrame", MainContent)
 MainTabFrame.Size = UDim2.new(1, 0, 1, 0)
 MainTabFrame.BackgroundTransparency = 1
 MainTabFrame.ScrollBarThickness = 2
-MainTabFrame.CanvasSize = UDim2.new(0, 0, 0, 210)
+MainTabFrame.CanvasSize = UDim2.new(0, 0, 0, 260)
+MainTabFrame.ClipsDescendants = false
 
 local UIList1 = Instance.new("UIListLayout", MainTabFrame)
 UIList1.HorizontalAlignment = Enum.HorizontalAlignment.Center
 UIList1.Padding = UDim.new(0, 6)
+
+local DropdownContainer = Instance.new("Frame", MainTabFrame)
+DropdownContainer.Size = UDim2.new(0, 150, 0, 34)
+DropdownContainer.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+DropdownContainer.ZIndex = 5
+Instance.new("UICorner", DropdownContainer).CornerRadius = UDim.new(0, 5)
+
+local DropdownBtn = Instance.new("TextButton", DropdownContainer)
+DropdownBtn.Size = UDim2.new(1, 0, 1, 0)
+DropdownBtn.BackgroundTransparency = 1
+DropdownBtn.Font = Enum.Font.SourceSansBold
+DropdownBtn.Text = "DROP AMOUNT: 1 v"
+DropdownBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+DropdownBtn.TextSize = 10
+DropdownBtn.ZIndex = 5
+
+local DropdownList = Instance.new("ScrollingFrame", DropdownContainer)
+DropdownList.Size = UDim2.new(1, 0, 0, 100)
+DropdownList.Position = UDim2.new(0, 0, 1, 2)
+DropdownList.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+DropdownList.Visible = false
+DropdownList.ScrollBarThickness = 3
+DropdownList.CanvasSize = UDim2.new(0, 0, 0, 200)
+DropdownList.ZIndex = 6
+Instance.new("UICorner", DropdownList).CornerRadius = UDim.new(0, 5)
+local ListStroke = Instance.new("UIStroke", DropdownList)
+ListStroke.Color = Color3.fromRGB(60, 60, 60)
+
+local UIListDrop = Instance.new("UIListLayout", DropdownList)
+UIListDrop.HorizontalAlignment = Enum.HorizontalAlignment.Center
+UIListDrop.Padding = UDim.new(0, 2)
+
+for i = 1, 10 do
+    local Option = Instance.new("TextButton", DropdownList)
+    Option.Size = UDim2.new(1, -4, 0, 18)
+    Option.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    Option.Font = Enum.Font.SourceSansBold
+    Option.Text = tostring(i)
+    Option.TextColor3 = Color3.fromRGB(200, 200, 200)
+    Option.TextSize = 10
+    Option.ZIndex = 6
+    Instance.new("UICorner", Option).CornerRadius = UDim.new(0, 3)
+    
+    Option.MouseButton1Click:Connect(function()
+        getgenv().SelectedDropAmount = i
+        DropdownBtn.Text = "DROP AMOUNT: " .. tostring(i) .. " v"
+        DropdownList.Visible = false
+    end)
+end
 
 local ToggleDrop = Instance.new("TextButton", MainTabFrame)
 ToggleDrop.Size = UDim2.new(0, 150, 0, 34)
@@ -145,6 +196,7 @@ ToggleDrop.Font = Enum.Font.SourceSansBold
 ToggleDrop.Text = "FAST DROP: OFF"
 ToggleDrop.TextColor3 = Color3.fromRGB(255, 255, 255)
 ToggleDrop.TextSize = 10
+ToggleDrop.ZIndex = 4
 Instance.new("UICorner", ToggleDrop).CornerRadius = UDim.new(0, 5)
 
 local ToggleEquip = Instance.new("TextButton", MainTabFrame)
@@ -154,6 +206,7 @@ ToggleEquip.Font = Enum.Font.SourceSansBold
 ToggleEquip.Text = "AUTO EQUIP: OFF"
 ToggleEquip.TextColor3 = Color3.fromRGB(255, 255, 255)
 ToggleEquip.TextSize = 10
+ToggleEquip.ZIndex = 4
 Instance.new("UICorner", ToggleEquip).CornerRadius = UDim.new(0, 5)
 
 local ToggleRaising = Instance.new("TextButton", MainTabFrame)
@@ -163,6 +216,7 @@ ToggleRaising.Font = Enum.Font.SourceSansBold
 ToggleRaising.Text = "AUTO RAISING: OFF"
 ToggleRaising.TextColor3 = Color3.fromRGB(255, 255, 255)
 ToggleRaising.TextSize = 10
+ToggleRaising.ZIndex = 4
 Instance.new("UICorner", ToggleRaising).CornerRadius = UDim.new(0, 5)
 
 local ToggleStack = Instance.new("TextButton", MainTabFrame)
@@ -172,6 +226,7 @@ ToggleStack.Font = Enum.Font.SourceSansBold
 ToggleStack.Text = "STACK BRAINROT: OFF"
 ToggleStack.TextColor3 = Color3.fromRGB(255, 255, 255)
 ToggleStack.TextSize = 10
+ToggleStack.ZIndex = 4
 Instance.new("UICorner", ToggleStack).CornerRadius = UDim.new(0, 5)
 
 local UpgradeTabFrame = Instance.new("ScrollingFrame", MainContent)
@@ -237,6 +292,7 @@ local function switchTab(activeFrame, activeBtn, inactiveBtn1, inactiveBtn2)
     inactiveBtn1.TextColor3 = Color3.fromRGB(150, 150, 150)
     inactiveBtn2.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
     inactiveBtn2.TextColor3 = Color3.fromRGB(150, 150, 150)
+    DropdownList.Visible = false
 end
 
 MainTabBtn.MouseButton1Click:Connect(function() switchTab(MainTabFrame, MainTabBtn, UpgradeTabBtn, CreditTabBtn) end)
@@ -244,6 +300,10 @@ UpgradeTabBtn.MouseButton1Click:Connect(function() switchTab(UpgradeTabFrame, Up
 CreditTabBtn.MouseButton1Click:Connect(function() switchTab(CreditTabFrame, CreditTabBtn, MainTabBtn, UpgradeTabBtn) end)
 
 LogoBtn.MouseButton1Click:Connect(function() MainFrame.Visible = not MainFrame.Visible end)
+
+DropdownBtn.MouseButton1Click:Connect(function()
+    DropdownList.Visible = not DropdownList.Visible
+end)
 
 ToggleDrop.MouseButton1Click:Connect(function()
     getgenv().AutoFastDrop = not getgenv().AutoFastDrop
@@ -303,8 +363,9 @@ local StackRemote = NetFolder["RF/QuickStack"]
 task.spawn(function()
     while true do
         if getgenv().AutoFastDrop then
+            local currentAmount = getgenv().SelectedDropAmount or 1
             for i = 1, 8 do
-                pcall(function() DropEvent:FireServer(1) end)
+                pcall(function() DropEvent:FireServer(currentAmount) end)
             end
         end
         task.wait()
