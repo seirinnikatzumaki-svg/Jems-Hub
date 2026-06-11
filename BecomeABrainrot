@@ -1,0 +1,178 @@
+-- Credits to Jems Hub
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+local UserInputService = game:GetService("UserInputService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local Workspace = game:GetService("Workspace")
+
+
+if PlayerGui:FindFirstChild("JemsBrainrotSummonGui") then
+    PlayerGui:FindFirstChild("JemsBrainrotSummonGui"):Destroy()
+end
+
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Name = "JemsBrainrotSummonGui"
+ScreenGui.ResetOnSpawn = false
+ScreenGui.Parent = PlayerGui
+
+getgenv().InfSpeedEnabled = false
+
+local function makeDraggable(frame)
+    local dragging, dragInput, dragStart, startPos
+    frame.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+            dragging = true; dragStart = input.Position; startPos = frame.Position
+            input.Changed:Connect(function() if input.UserInputState == Enum.UserInputState.End then dragging = false end end)
+        end
+    end)
+    frame.InputChanged:Connect(function(input) if input.UserInputType == Enum.UserInputType.MouseMovement or input.UserInputType == Enum.UserInputType.Touch then dragInput = input end end)
+    UserInputService.InputChanged:Connect(function(input) if input == dragInput and dragging then local delta = input.Position - dragStart frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y) end end)
+end
+
+local LogoBtn = Instance.new("TextButton")
+LogoBtn.Parent = ScreenGui; LogoBtn.BackgroundColor3 = Color3.fromRGB(0, 0, 0); LogoBtn.Position = UDim2.new(0.3, -20, 0.2, 0); LogoBtn.Size = UDim2.new(0, 40, 0, 40)         
+LogoBtn.Font = Enum.Font.SourceSansBold; LogoBtn.Text = "J"; LogoBtn.TextColor3 = Color3.fromRGB(170, 0, 255); LogoBtn.TextSize = 20
+local BtnCorner = Instance.new("UICorner") BtnCorner.CornerRadius = UDim.new(0, 20) BtnCorner.Parent = LogoBtn
+local BtnStroke = Instance.new("UIStroke") BtnStroke.Color = Color3.fromRGB(255, 255, 255) BtnStroke.Parent = LogoBtn
+makeDraggable(LogoBtn)
+
+local MainFrame = Instance.new("Frame")
+MainFrame.Parent = ScreenGui; MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15); MainFrame.Position = UDim2.new(0.3, -75, 0.35, 0); MainFrame.Size = UDim2.new(0, 200, 0, 165) 
+local FrameCorner = Instance.new("UICorner") FrameCorner.Parent = MainFrame
+local FrameStroke = Instance.new("UIStroke") FrameStroke.Color = Color3.fromRGB(170, 0, 255) FrameStroke.Parent = MainFrame
+makeDraggable(MainFrame)
+
+LogoBtn.MouseButton1Click:Connect(function() MainFrame.Visible = not MainFrame.Visible end)
+
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.Parent = MainFrame; TitleLabel.BackgroundTransparency = 1; TitleLabel.Size = UDim2.new(1, 0, 0, 25)
+TitleLabel.Font = Enum.Font.SourceSansBold; TitleLabel.Text = "Become a Brainrot"; TitleLabel.TextColor3 = Color3.fromRGB(170, 0, 255); TitleLabel.TextSize = 13
+
+local TabHolder = Instance.new("Frame")
+TabHolder.Parent = MainFrame; TabHolder.BackgroundTransparency = 1; TabHolder.Position = UDim2.new(0, 0, 0, 25); TabHolder.Size = UDim2.new(1, 0, 0, 25)
+
+local MainTabBtn = Instance.new("TextButton")
+MainTabBtn.Parent = TabHolder; MainTabBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30); MainTabBtn.Position = UDim2.new(0.05, 0, 0, 0); MainTabBtn.Size = UDim2.new(0, 90, 0, 22)
+MainTabBtn.Font = Enum.Font.SourceSansBold; MainTabBtn.Text = "Main"; MainTabBtn.TextColor3 = Color3.fromRGB(255, 255, 255); MainTabBtn.TextSize = 12
+local MainTabCorner = Instance.new("UICorner") MainTabCorner.Parent = MainTabBtn
+
+local CreditsTabBtn = Instance.new("TextButton")
+CreditsTabBtn.Parent = TabHolder; CreditsTabBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 20); CreditsTabBtn.Position = UDim2.new(0.5, 5, 0, 0); CreditsTabBtn.Size = UDim2.new(0, 90, 0, 22)
+CreditsTabBtn.Font = Enum.Font.SourceSansBold; CreditsTabBtn.Text = "Credits"; CreditsTabBtn.TextColor3 = Color3.fromRGB(150, 150, 150); CreditsTabBtn.TextSize = 12
+local CreditsTabCorner = Instance.new("UICorner") CreditsTabCorner.Parent = CreditsTabBtn
+
+local MainTabFrame = Instance.new("Frame")
+MainTabFrame.Parent = MainFrame; MainTabFrame.BackgroundTransparency = 1; MainTabFrame.Position = UDim2.new(0, 0, 0, 50); MainTabFrame.Size = UDim2.new(1, 0, 1, -50)
+
+local ClickSummonButton = Instance.new("TextButton")
+ClickSummonButton.Parent = MainTabFrame; ClickSummonButton.BackgroundColor3 = Color3.fromRGB(85, 0, 127); ClickSummonButton.Position = UDim2.new(0.1, 0, 0.05, 0); ClickSummonButton.Size = UDim2.new(0, 160, 0, 32)
+ClickSummonButton.Font = Enum.Font.SourceSansBold; ClickSummonButton.Text = "Summon Brainrot"; ClickSummonButton.TextColor3 = Color3.fromRGB(255, 255, 255); ClickSummonButton.TextSize = 12
+local ToggleCorner1 = Instance.new("UICorner") ToggleCorner1.Parent = ClickSummonButton
+
+local ToggleButton2 = Instance.new("TextButton")
+ToggleButton2.Parent = MainTabFrame; ToggleButton2.BackgroundColor3 = Color3.fromRGB(40, 40, 40); ToggleButton2.Position = UDim2.new(0.1, 0, 0.38, 0); ToggleButton2.Size = UDim2.new(0, 160, 0, 32)
+ToggleButton2.Font = Enum.Font.SourceSansBold; ToggleButton2.Text = "Inf Speed: OFF"; ToggleButton2.TextColor3 = Color3.fromRGB(255, 255, 255); ToggleButton2.TextSize = 12
+local ToggleCorner2 = Instance.new("UICorner") ToggleCorner2.Parent = ToggleButton2
+
+local StatusLabel = Instance.new("TextLabel")
+StatusLabel.Parent = MainTabFrame; StatusLabel.BackgroundTransparency = 1; StatusLabel.Position = UDim2.new(0.05, 0, 0.72, 0); StatusLabel.Size = UDim2.new(0, 180, 0, 20)
+StatusLabel.Font = Enum.Font.SourceSansItalic; StatusLabel.Text = "Status: Ready"
+StatusLabel.TextColor3 = Color3.fromRGB(180, 180, 180); StatusLabel.TextSize = 11; StatusLabel.TextWrapped = true
+
+local CreditsTabFrame = Instance.new("Frame")
+CreditsTabFrame.Parent = MainFrame; CreditsTabFrame.BackgroundTransparency = 1; CreditsTabFrame.Position = UDim2.new(0, 0, 0, 50); CreditsTabFrame.Size = UDim2.new(1, 0, 1, -50)
+CreditsTabFrame.Visible = false -- Nakatago sa simula
+
+local CreditsBox = Instance.new("Frame")
+CreditsBox.Parent = CreditsTabFrame; CreditsBox.BackgroundColor3 = Color3.fromRGB(25, 25, 25); CreditsBox.Position = UDim2.new(0.1, 0, 0.1, 0); CreditsBox.Size = UDim2.new(0, 160, 0, 75)
+local BoxCorner = Instance.new("UICorner") BoxCorner.Parent = CreditsBox
+local BoxStroke = Instance.new("UIStroke") BoxStroke.Color = Color3.fromRGB(45, 45, 45) BoxStroke.Parent = CreditsBox
+
+local ScriptDevLabel = Instance.new("TextLabel")
+ScriptDevLabel.Parent = CreditsBox; ScriptDevLabel.BackgroundTransparency = 1; ScriptDevLabel.Position = UDim2.new(0, 0, 0.2, 0); ScriptDevLabel.Size = UDim2.new(1, 0, 0, 20)
+ScriptDevLabel.Font = Enum.Font.SourceSansBold; ScriptDevLabel.Text = "Script Developer:"; ScriptDevLabel.TextColor3 = Color3.fromRGB(170, 0, 255); ScriptDevLabel.TextSize = 12
+
+local AuthorLabel = Instance.new("TextLabel")
+AuthorLabel.Parent = CreditsBox; AuthorLabel.BackgroundTransparency = 1; AuthorLabel.Position = UDim2.new(0, 0, 0.5, 0); AuthorLabel.Size = UDim2.new(1, 0, 0, 20)
+AuthorLabel.Font = Enum.Font.SourceSansBold; AuthorLabel.Text = "Jems"; AuthorLabel.TextColor3 = Color3.fromRGB(0, 255, 200); AuthorLabel.TextSize = 15
+
+MainTabBtn.MouseButton1Click:Connect(function()
+    MainTabFrame.Visible = true
+    CreditsTabFrame.Visible = false
+    MainTabBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    MainTabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    CreditsTabBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    CreditsTabBtn.TextColor3 = Color3.fromRGB(150, 150, 150)
+end)
+
+CreditsTabBtn.MouseButton1Click:Connect(function()
+    MainTabFrame.Visible = false
+    CreditsTabFrame.Visible = true
+    MainTabBtn.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+    MainTabBtn.TextColor3 = Color3.fromRGB(150, 150, 150)
+    CreditsTabBtn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    CreditsTabBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+end)
+
+local SummonEvent = ReplicatedStorage:WaitForChild("Events"):WaitForChild("SummonBrainrots")
+local TargetLocation = Workspace:WaitForChild("Locations"):WaitForChild("End")
+
+ClickSummonButton.MouseButton1Click:Connect(function()
+    pcall(function()
+        SummonEvent:FireServer(TargetLocation)
+        StatusLabel.Text = "Summoned at Location End!"
+    end)
+end)
+
+local function setPlayerSpeed(speedValue)
+    pcall(function()
+        if LocalPlayer:FindFirstChild("Speed") then
+            if LocalPlayer.Speed:IsA("NumberValue") or LocalPlayer.Speed:IsA("IntValue") then
+                LocalPlayer.Speed.Value = speedValue
+            else
+                LocalPlayer.Speed = speedValue
+            end
+        end
+        
+        local character = LocalPlayer.Character
+        if character then
+            local humanoid = character:FindFirstChildOfClass("Humanoid")
+            if humanoid then
+                humanoid.WalkSpeed = speedValue
+            end
+        end
+    end)
+end
+
+task.spawn(function()
+    while true do
+        if getgenv().InfSpeedEnabled then
+            setPlayerSpeed(9999999)
+        end
+        task.wait(0.05)
+    end
+end)
+
+LocalPlayer.CharacterAdded:Connect(function(newCharacter)
+    task.wait(0.5)
+    if getgenv().InfSpeedEnabled then
+        setPlayerSpeed(9999999)
+    end
+end)
+
+ToggleButton2.MouseButton1Click:Connect(function()
+    getgenv().InfSpeedEnabled = not getgenv().InfSpeedEnabled
+    if getgenv().InfSpeedEnabled then
+        ToggleButton2.Text = "Inf Speed: ON"
+        ToggleButton2.BackgroundColor3 = Color3.fromRGB(0, 180, 255)
+        StatusLabel.Text = "Speed Locked to 9999999!"
+        setPlayerSpeed(9999999)
+    else
+        ToggleButton2.Text = "Inf Speed: OFF"
+        ToggleButton2.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+        StatusLabel.Text = "Status: Speed returned to normal"
+        setPlayerSpeed(16)
+    end
+end)
