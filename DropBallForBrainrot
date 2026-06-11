@@ -18,6 +18,7 @@ ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 getgenv().AutoFastDrop = false
 getgenv().AutoEquipBest = false
 getgenv().AutoRaising = false
+getgenv().AutoStack = false
 getgenv().AutoGoldenBall = false
 getgenv().AutoDiamondBall = false
 getgenv().AutoBouncyBall = false
@@ -131,7 +132,7 @@ local MainTabFrame = Instance.new("ScrollingFrame", MainContent)
 MainTabFrame.Size = UDim2.new(1, 0, 1, 0)
 MainTabFrame.BackgroundTransparency = 1
 MainTabFrame.ScrollBarThickness = 2
-MainTabFrame.CanvasSize = UDim2.new(0, 0, 0, 180)
+MainTabFrame.CanvasSize = UDim2.new(0, 0, 0, 210)
 
 local UIList1 = Instance.new("UIListLayout", MainTabFrame)
 UIList1.HorizontalAlignment = Enum.HorizontalAlignment.Center
@@ -163,6 +164,15 @@ ToggleRaising.Text = "AUTO RAISING: OFF"
 ToggleRaising.TextColor3 = Color3.fromRGB(255, 255, 255)
 ToggleRaising.TextSize = 10
 Instance.new("UICorner", ToggleRaising).CornerRadius = UDim.new(0, 5)
+
+local ToggleStack = Instance.new("TextButton", MainTabFrame)
+ToggleStack.Size = UDim2.new(0, 150, 0, 34)
+ToggleStack.BackgroundColor3 = Color3.fromRGB(40, 40, 40) 
+ToggleStack.Font = Enum.Font.SourceSansBold
+ToggleStack.Text = "STACK BRAINROT: OFF"
+ToggleStack.TextColor3 = Color3.fromRGB(255, 255, 255)
+ToggleStack.TextSize = 10
+Instance.new("UICorner", ToggleStack).CornerRadius = UDim.new(0, 5)
 
 local UpgradeTabFrame = Instance.new("ScrollingFrame", MainContent)
 UpgradeTabFrame.Size = UDim2.new(1, 0, 1, 0)
@@ -253,6 +263,12 @@ ToggleRaising.MouseButton1Click:Connect(function()
     ToggleRaising.BackgroundColor3 = getgenv().AutoRaising and Color3.fromRGB(170, 0, 255) or Color3.fromRGB(40, 40, 40)
 end)
 
+ToggleStack.MouseButton1Click:Connect(function()
+    getgenv().AutoStack = not getgenv().AutoStack
+    ToggleStack.Text = "STACK BRAINROT: " .. (getgenv().AutoStack and "ON" or "OFF")
+    ToggleStack.BackgroundColor3 = getgenv().AutoStack and Color3.fromRGB(0, 210, 100) or Color3.fromRGB(40, 40, 40)
+end)
+
 BtnGolden.MouseButton1Click:Connect(function()
     getgenv().AutoGoldenBall = not getgenv().AutoGoldenBall
     BtnGolden.Text = "AUTO GOLDEN: " .. (getgenv().AutoGoldenBall and "ON" or "OFF")
@@ -282,6 +298,7 @@ local DropEvent = NetFolder["RE/BallDrop"]
 local EquipRemote = NetFolder["RF/EquipBestBrainrots"]
 local UpgradeRemote = NetFolder["RF/PurchaseUpgrade"]
 local RaiseLevelRemote = NetFolder["RF/UnlockBallDropLevel"]
+local StackRemote = NetFolder["RF/QuickStack"]
 
 task.spawn(function()
     while true do
@@ -313,6 +330,19 @@ task.spawn(function()
             end)
         end
         task.wait(2)
+    end
+end)
+
+task.spawn(function()
+    while true do
+        if getgenv().AutoStack then
+            pcall(function()
+                task.spawn(function()
+                    StackRemote:InvokeServer()
+                end)
+            end)
+        end
+        task.wait(3)
     end
 end)
 
